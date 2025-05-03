@@ -43,7 +43,8 @@ def process_document(file_path):
             temp_file.write(str(result.document))
             temp_file_path = temp_file.name
 
-            full_data = make_dict_form_file(temp_file_path)
+        full_data = make_dict_form_file(temp_file_path)
+        print(f">>>FULL DATA<<< {full_data}")
     except Exception as e:
         logger.error(f"Error during data extraction: {str(e)}")
         return "Error: Unable to extract data from the document."
