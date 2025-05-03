@@ -18,7 +18,7 @@ import os
 ##########################################################################################
 load_dotenv()
 TELEGRAM_API_KEY = os.getenv("TELEGRAM_API_KEY")
-app = (ApplicationBuilder().token(TELEGRAM_API_KEY).build())
+app = ApplicationBuilder().token(TELEGRAM_API_KEY).build()
 ##########################################################################################
 
 
@@ -50,7 +50,9 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             text="✅ Great! Let's begin with your car insurance process 🚗📝"
         )
         # here we add an answer from openAI
-        response = await ask_openai("explain the car insurance process in simple English")
+        response = await ask_openai(
+            "explain the car insurance process in simple English"
+        )
         await query.message.reply_text(response)
         # set the user state
         context.user_data["stage"] = "waiting_for_drivers_licence_photo"
@@ -85,8 +87,10 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 f"✅ Car photo with VIN saved.\n🎉 {context.user_data['car_photo_path']}"
                 "All photos received. We will now begin processing your insurance."
             )
-            
-            await update.message.reply_text(f"We are proceesing your documents... Please wait for 5-10 seconds...")
+
+            await update.message.reply_text(
+                f"We are proceesing your documents... Please wait for 5-10 seconds..."
+            )
             await handle_user_confirmation(update, context)
         else:
             await update.message.reply_text(
@@ -100,16 +104,18 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def handle_user_confirmation(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message = update.message or update.callback_query.message
     if context.user_data["stage"] == "complete":
-        # Processing the photos with mindee API 
-        drivers_licance_result_document = process_document(context.user_data['license_photo_path'])
-        car_result_document = process_document(context.user_data['car_photo_path'])
+        # Processing the photos with mindee API
+        drivers_licance_result_document = process_document(
+            context.user_data["license_photo_path"]
+        )
+        car_result_document = process_document(context.user_data["car_photo_path"])
 
         await message.reply_text("✅ Your documents have been processed successfully!")
         await message.reply_text("✅ Wait for the processing result ...")
         await message.reply_text(
             "✅ Please confirm the data:\n\n"
-             f"🚗 Driver's License:\n{drivers_licance_result_document}\n\n"
-             f"🚗 Car Document:\n{car_result_document}\n\n"
+            f"🚗 Driver's License:\n{drivers_licance_result_document}\n\n"
+            f"🚗 Car Document:\n{car_result_document}\n\n"
         )
 
         keyboard = [
@@ -189,16 +195,21 @@ async def handle_price_confirmation(update: Update, context: ContextTypes.DEFAUL
                 policy_text = f.read()
 
             await query.message.reply_text(
-                f"📄 *Company Policy Document:*\n\n{policy_text}",
-                parse_mode="Markdown"
-        )
+                f"📄 *Company Policy Document:*\n\n{policy_text}", parse_mode="Markdown"
+            )
         except FileNotFoundError as e:
-            await query.message.reply_text("❌ Error: Company policy document not found.")
+            await query.message.reply_text(
+                "❌ Error: Company policy document not found."
+            )
             print(f"FileNotFoundError: {e}")
 
         keyboard = [
-            [InlineKeyboardButton("✅ I agree", callback_data="policy_agree"),
-            InlineKeyboardButton("❌ I do not agree", callback_data="policy_disagree"),]
+            [
+                InlineKeyboardButton("✅ I agree", callback_data="policy_agree"),
+                InlineKeyboardButton(
+                    "❌ I do not agree", callback_data="policy_disagree"
+                ),
+            ]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         await query.message.reply_text(
@@ -207,8 +218,6 @@ async def handle_price_confirmation(update: Update, context: ContextTypes.DEFAUL
         # ask open ai
         response = await ask_openai("explain why you have to agree with the policy")
         await query.message.reply_text(response)
-
-
 
         # Proceed to finalization
     elif query.data == "price_confirm_no":
@@ -220,18 +229,25 @@ async def handle_price_confirmation(update: Update, context: ContextTypes.DEFAUL
 
 ############################################################################################################
 # working with the policy confirmation
-async def handle_policy_confirmation(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def handle_policy_confirmation(
+    update: Update, context: ContextTypes.DEFAULT_TYPE
+):
     query = update.callback_query
     await query.answer()
 
     if query.data == "policy_agree":
-        await query.edit_message_text("🎉 Thank you for agreeing! Your insurance is now being finalized.")
+        await query.edit_message_text(
+            "🎉 Thank you for agreeing! Your insurance is now being finalized."
+        )
     elif query.data == "policy_disagree":
-        await query.edit_message_text("❌ You must agree to the policy to proceed with the insurance.")
+        await query.edit_message_text(
+            "❌ You must agree to the policy to proceed with the insurance."
+        )
         await show_policy_document(update, context)
-        
+
 
 ################################################################################################################
+
 
 async def show_policy_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Send the company policy document again with the buttons for confirmation
@@ -243,36 +259,46 @@ async def show_policy_document(update: Update, context: ContextTypes.DEFAULT_TYP
 
     # Send the document as text (not as a file)
     await update.callback_query.message.reply_text(
-        policy_text,
-        parse_mode=ParseMode.MARKDOWN 
+        policy_text, parse_mode=ParseMode.MARKDOWN
     )
 
     keyboard = [
         [
-            InlineKeyboardButton("✅ I agree with the policy", callback_data="policy_agree")
+            InlineKeyboardButton(
+                "✅ I agree with the policy", callback_data="policy_agree"
+            )
         ],
         [
-            InlineKeyboardButton("❌ I disagree with the policy", callback_data="policy_disagree")
-        ]
+            InlineKeyboardButton(
+                "❌ I disagree with the policy", callback_data="policy_disagree"
+            )
+        ],
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     # Re-send the confirmation message with the policy document
     await update.callback_query.message.reply_text(
         "📄 Please read and confirm our company policy document below:\n\nDo you agree?",
-        reply_markup=reply_markup
+        reply_markup=reply_markup,
     )
 
 
 ################################################################################################################
-if __name__ == '__main__':
+if __name__ == "__main__":
     # adding handlers
     app.add_handler(CommandHandler("start", start))
-    app.add_handler(CallbackQueryHandler(button_handler, pattern="^(start_insurance|price_confirm_.*)$"))
-    app.add_handler(CallbackQueryHandler(handle_user_confirmation_response, pattern="^confirm_"))
-    app.add_handler(CallbackQueryHandler(handle_policy_confirmation, pattern="^policy_"))
+    app.add_handler(
+        CallbackQueryHandler(
+            button_handler, pattern="^(start_insurance|price_confirm_.*)$"
+        )
+    )
+    app.add_handler(
+        CallbackQueryHandler(handle_user_confirmation_response, pattern="^confirm_")
+    )
+    app.add_handler(
+        CallbackQueryHandler(handle_policy_confirmation, pattern="^policy_")
+    )
     app.add_handler(MessageHandler(filters.PHOTO, handle_photo))
 
-
-        # ▶launching the bot
+    # ▶launching the bot
     app.run_polling()
