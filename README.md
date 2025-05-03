@@ -40,7 +40,7 @@ python main.py
 
 # How it works
 type /start to start interacting woth bot
-or click [t.me/TgBotCarBot?start=1](t.me/TgBotCarBot?start=1)
+or click [t.me/TgBotCarBot?start=1](https://t.me/TgBotCarBot?start=1)
 
 ## Process of interaction with user
 - User starts the bot with /start
