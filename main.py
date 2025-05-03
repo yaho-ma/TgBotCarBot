@@ -105,17 +105,15 @@ async def handle_user_confirmation(update: Update, context: ContextTypes.DEFAULT
     message = update.message or update.callback_query.message
     if context.user_data["stage"] == "complete":
         # Processing the photos with mindee API
-        drivers_licance_result_document = process_document(
-            context.user_data["license_photo_path"]
-        )
-        car_result_document = process_document(context.user_data["car_photo_path"])
+        #drivers_licance_result_document = process_document(context.user_data["license_photo_path"])
+        #car_result_document = process_document(context.user_data["car_photo_path"])
 
         await message.reply_text("✅ Your documents have been processed successfully!")
         await message.reply_text("✅ Wait for the processing result ...")
         await message.reply_text(
             "✅ Please confirm the data:\n\n"
-            f"🚗 Driver's License:\n{drivers_licance_result_document}\n\n"
-            f"🚗 Car Document:\n{car_result_document}\n\n"
+           # f"🚗 Driver's License:\n{drivers_licance_result_document}\n\n"
+           # f"🚗 Car Document:\n{car_result_document}\n\n"
         )
 
         keyboard = [
@@ -171,12 +169,14 @@ async def proceed_to_price_quotation(message, context: ContextTypes.DEFAULT_TYPE
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
+    response = await ask_openai("explain why we have this price and why it is good")
+    await message.reply_text(response)
+
     await message.reply_text(
         "💰 The price for the insurance is 100 USD. Do you agree?",
         reply_markup=reply_markup,
     )
-    response = await ask_openai("explain why we have this price and why it is good")
-    await message.reply_text(response)
+    
 
 
 # working with user's answer
@@ -212,12 +212,15 @@ async def handle_price_confirmation(update: Update, context: ContextTypes.DEFAUL
             ]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
-        await query.message.reply_text(
-            "Do you agree with the policy terms?", reply_markup=reply_markup
-        )
+
         # ask open ai
         response = await ask_openai("explain why you have to agree with the policy")
         await query.message.reply_text(response)
+        
+        await query.message.reply_text(
+            "Do you agree with the policy terms?", reply_markup=reply_markup
+        )
+        
 
         # Proceed to finalization
     elif query.data == "price_confirm_no":
