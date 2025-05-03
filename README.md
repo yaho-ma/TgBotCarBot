@@ -18,7 +18,9 @@ git clone (https://github.com/yaho-ma/TgBotCarBot)
 ```
 
 ### 2. Set Up Environment Variables
-Create a `.env` file and add your keys. TELEGRAM_API_KEY="your_key", MINDEE_API_KEY="your_key"
+Create a `.env` file and add your keys. 
+TELEGRAM_API_KEY="your_key"
+MINDEE_API_KEY="your_key"
 
 ### 3. Create virtual environmevt
 ```bash
@@ -38,7 +40,7 @@ python main.py
 
 # How it works
 type /start to start interacting woth bot
-or click t.me/TgBotCarBot?start=1
+or click [t.me/TgBotCarBot?start=1](t.me/TgBotCarBot?start=1)
 
 ## Process of interaction with user
 - User starts the bot with /start
